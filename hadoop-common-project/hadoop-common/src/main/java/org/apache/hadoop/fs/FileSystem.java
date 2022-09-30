@@ -1891,23 +1891,26 @@ public abstract class FileSystem extends Configured
     if (status.isFile()) {
       // f is a file
       long length = status.getLen();
+      long spaceConsumed = status.getDiskConsumed();
       return new ContentSummary.Builder().length(length).
-          fileCount(1).directoryCount(0).spaceConsumed(length).build();
+          fileCount(1).directoryCount(0).spaceConsumed(spaceConsumed).build();
     }
     // f is a directory
-    long[] summary = {0, 0, 1};
+    long[] summary = {0, 0, 0, 1};
     for(FileStatus s : listStatus(f)) {
       long length = s.getLen();
+      long spaceConsumed = s.getDiskConsumed();
       ContentSummary c = s.isDirectory() ? getContentSummary(s.getPath()) :
           new ContentSummary.Builder().length(length).
-          fileCount(1).directoryCount(0).spaceConsumed(length).build();
+          fileCount(1).directoryCount(0).spaceConsumed(spaceConsumed).build();
       summary[0] += c.getLength();
-      summary[1] += c.getFileCount();
-      summary[2] += c.getDirectoryCount();
+      summary[1] += c.getSpaceConsumed();
+      summary[2] += c.getFileCount();
+      summary[3] += c.getDirectoryCount();
     }
     return new ContentSummary.Builder().length(summary[0]).
-        fileCount(summary[1]).directoryCount(summary[2]).
-        spaceConsumed(summary[0]).build();
+        fileCount(summary[2]).directoryCount(summary[3]).
+        spaceConsumed(summary[1]).build();
   }
 
   /** Return the {@link QuotaUsage} of a given {@link Path}.

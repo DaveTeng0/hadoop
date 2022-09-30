@@ -45,6 +45,7 @@ public class FileStatus implements Writable, Comparable<Object>,
 
   private Path path;
   private long length;
+  private long diskConsumed;
   private Boolean isdir;
   private short block_replication;
   private long blocksize;
@@ -148,6 +149,18 @@ public class FileStatus implements Writable, Comparable<Object>,
         false, false, false);
   }
 
+  public FileStatus(long length, long diskConsumed, boolean isdir,
+                    int block_replication,
+                    long blocksize, long modification_time, long access_time,
+                    FsPermission permission, String owner, String group,
+                    Path symlink,
+                    Path path) {
+    this(length, isdir, block_replication, blocksize, modification_time,
+            access_time, permission, owner, group, symlink, path,
+            false, false, false);
+    this.diskConsumed = diskConsumed;
+  }
+
   public FileStatus(long length, boolean isdir, int block_replication,
       long blocksize, long modification_time, long access_time,
       FsPermission permission, String owner, String group, Path symlink,
@@ -211,6 +224,14 @@ public class FileStatus implements Writable, Comparable<Object>,
    */
   public long getLen() {
     return length;
+  }
+
+    /**
+   * Get the disk consumed of this file with its replication, in bytes.
+   * @return the diskConsumed of this file with its replication, in bytes.
+   */
+  public long getDiskConsumed() {
+    return diskConsumed;
   }
 
   /**
@@ -462,6 +483,7 @@ public class FileStatus implements Writable, Comparable<Object>,
         .append("; isDirectory=" + isdir);
     if(!isDirectory()){
       sb.append("; length=" + length)
+          .append("; diskConsumed= " + getDiskConsumed())
           .append("; replication=" + block_replication)
           .append("; blocksize=" + blocksize);
     }

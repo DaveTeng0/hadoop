@@ -47,7 +47,7 @@ public class LocatedFileStatus extends FileStatus {
    * @param locations a file's block locations
    */
   public LocatedFileStatus(FileStatus stat, BlockLocation[] locations) {
-    this(stat.getLen(), stat.isDirectory(), stat.getReplication(),
+    this(stat.getLen(), stat.getDiskConsumed(), stat.isDirectory(), stat.getReplication(),
         stat.getBlockSize(), stat.getModificationTime(),
         stat.getAccessTime(), stat.getPermission(),
         stat.getOwner(), stat.getGroup(), null, stat.getPath(),
@@ -60,6 +60,19 @@ public class LocatedFileStatus extends FileStatus {
       }
     }
   }
+
+  public LocatedFileStatus(long length, long diskConsumed, boolean isdir,
+    int block_replication, long blocksize, long modification_time,
+    long access_time, FsPermission permission, String owner, String group,
+    Path symlink, Path path, boolean hasAcl, boolean isEncrypted, boolean isErasureCoded,
+    BlockLocation[] locations) {
+    this(length, isdir, block_replication, blocksize, modification_time,
+    access_time, permission, owner, group, symlink, path,
+    attributes(hasAcl, isEncrypted, isErasureCoded, false), locations);
+    this.locations = locations;
+    this.setDiskConsumed(diskConsumed);
+  }
+
 
   /**
    * Constructor
